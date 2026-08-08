@@ -1,3 +1,5 @@
+!pip install feedparser google-generativeai
+
 import os
 import requests
 import feedparser
