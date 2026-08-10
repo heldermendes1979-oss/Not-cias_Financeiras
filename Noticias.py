@@ -70,7 +70,7 @@ Notícias brutas:
 
 # Usando o método generate_content
 resposta = client.models.generate_content(
-    model='gemini-1.5-flash',
+    model='gemini-3.6-flash-latest',
     contents=prompt
 )
 resumo_final = resposta.text
