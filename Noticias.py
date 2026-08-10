@@ -78,10 +78,18 @@ resumo_final = resposta.text
 print("Enviando para o Telegram...")
 # 4. Enviar mensagem para o Telegram
 url_tel = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+
+# Removido o 'parse_mode': 'Markdown' para evitar bloqueios do Telegram por formatação
 payload = {
     'chat_id': CHAT_ID,
-    'text': resumo_final,
-    'parse_mode': 'Markdown'
+    'text': resumo_final
 }
-requests.post(url_tel, data=payload)
-print("Processo concluído com sucesso!")
+
+resposta_telegram = requests.post(url_tel, data=payload)
+
+# 5. Verificação de sucesso ou erro
+if resposta_telegram.status_code == 200:
+    print("Processo concluído com sucesso! Mensagem entregue no Telegram.")
+else:
+    print(f"ERRO DO TELEGRAM (Código {resposta_telegram.status_code}):")
+    print(resposta_telegram.text)
