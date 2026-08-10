@@ -1,13 +1,14 @@
 import os
 import requests
 import feedparser
+import urllib.parse
 from google import genai
 
 # 1. Carregar chaves de API (GitHub Secrets)
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
 CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
 
-# Nova forma de inicializar o cliente da API do Gemini
+# Cliente da API do Gemini
 client = genai.Client(api_key=os.environ.get('GEMINI_API_KEY'))
 
 # 2. Definir os temas e a sua carteira consolidada
@@ -36,7 +37,10 @@ carteira = [
 ]
 
 def buscar_noticias(termo):
-    url = f"https://news.google.com/rss/search?q={termo}+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+    # Formata o termo de busca para ser seguro em URLs (codifica espaços e aspas)
+    termo_seguro = urllib.parse.quote(termo)
+    url = f"https://news.google.com/rss/search?q={termo_seguro}+when:1d&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+    
     feed = feedparser.parse(url)
     return [entry.title for entry in feed.entries[:3]]
 
@@ -64,7 +68,7 @@ Notícias brutas:
 {texto_bruto}
 """
 
-# Usando o novo método generate_content
+# Usando o método generate_content
 resposta = client.models.generate_content(
     model='gemini-1.5-flash',
     contents=prompt
