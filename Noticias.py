@@ -23,16 +23,12 @@ carteira = [
     '"EMBR3" OR "Embraer"',
     '"POMO3" OR "Marcopolo"',
     '"AXIA3"',
-    '"GGBR4" OR "Gerdau"',
-    '"RAIZ4" OR "Raízen"',
     '"VGT" ETF',
     '"KWEB" ETF',
     '"TFLO" ETF',
-    '"BLOK" ETF',
     '"GLD" ouro',
-    '"RITM" mercado financeiro',
-    '"ARLP" stocks',
-    '"Copper ETF" OR "ETF de Cobre"',
+    '"RSP" ETF',
+    '"BITCOIN" criptomoeda',
     '"Solana" criptomoeda'
 ]
 
@@ -56,7 +52,7 @@ print("Gerando resumo com IA...")
 
 # 3. Novo modelo de chamada do Gemini
 prompt = f"""
-Você é um analista financeiro. Leia as manchetes abaixo e crie um boletim matinal executivo, curto e direto em português.
+Você é um analista financeiro. Leia as manchetes e noticias abaixo e crie um boletim matinal executivo, analítico, resumido e direto em português.
 Divida o boletim em duas seções usando Markdown:
 1. 🌍 Macroeconomia (Destaques de Brasil e EUA)
 2. 💼 Radar da Carteira (O que aconteceu com os ativos específicos)
