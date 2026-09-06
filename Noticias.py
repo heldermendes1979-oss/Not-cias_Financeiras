@@ -57,7 +57,7 @@ Divida o boletim em duas seções usando Markdown:
 1. 🌍 Macroeconomia (Destaques de Brasil e EUA)
 2. 💼 Radar da Carteira (O que aconteceu com os ativos específicos)
 
-Foque apenas no que é relevante, como pagamentos de dividendos, balanços e fatos relevantes. 
+Foque apenas no que é relevante, como notícias que impactem o preço do papel, pagamentos de dividendos, balanços e fatos relevantes. 
 Se não houver notícia para um ativo, ignore-o e não o mencione no resumo.
 
 Notícias brutas:
