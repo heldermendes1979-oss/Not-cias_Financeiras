@@ -1,10 +1,10 @@
 import yfinance as yf
-import pandas_ta as ta
+import ta
 import pandas as pd
 import os
 import requests
 
-# Carteira com os Tickers exatos para o Yahoo Finance ler os preços
+# Carteira com os Tickers exatos para o Yahoo Finance
 ativos = [
     "VALE3.SA",
     "BBAS3.SA",
@@ -19,8 +19,8 @@ ativos = [
     "TFLO",
     "GLD",
     "RSP",
-    "BTC-USD",  # Código oficial do Bitcoin no Yahoo Finance
-    "SOL-USD"   # Código oficial da Solana no Yahoo Finance
+    "BTC-USD",
+    "SOL-USD"
 ]
 
 print("📊 Análise Técnica da Carteira\n")
@@ -35,16 +35,15 @@ for ativo in ativos:
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.droplevel(1)
             
-        # Pula o ativo se não retornou dados válidos
         if df.empty:
             print(f"Sem dados para {ativo}")
             continue
             
-        # 2. Calcular os indicadores matemáticos automaticamente na tabela
-        df.ta.ema(length=20, append=True)
-        df.ta.ema(length=50, append=True)
-        df.ta.rsi(length=14, append=True)
-        df.ta.atr(length=14, append=True)
+        # 2. Calcular os indicadores usando a biblioteca 'ta'
+        df['EMA_20'] = ta.trend.ema_indicator(df['Close'], window=20)
+        df['EMA_50'] = ta.trend.ema_indicator(df['Close'], window=50)
+        df['RSI_14'] = ta.momentum.rsi(df['Close'], window=14)
+        df['ATRr_14'] = ta.volatility.average_true_range(df['High'], df['Low'], df['Close'], window=14)
         
         # 3. Extrair os valores do dia mais recente
         ultimo_dia = df.iloc[-1]
@@ -97,8 +96,6 @@ CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
 
 url_tel = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
 
-# Removido o parse_mode Markdown temporariamente para evitar falhas de envio
-# caso algum número gere um caractere não reconhecido pelo Telegram
 payload = {
     'chat_id': CHAT_ID,
     'text': relatorio
