@@ -107,3 +107,26 @@ if resposta_telegram.status_code == 200:
     print("Relatório técnico enviado com sucesso!")
 else:
     print(f"Erro ao enviar: {resposta_telegram.text}")
+
+# 4. Enviar para o E-mail
+print("Enviando para o e-mail...")
+try:
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_USER
+    msg['To'] = EMAIL_DESTINO
+    msg['Subject'] = 'Boletim Financeiro Diário'
+    
+    # Adiciona o texto do resumo no corpo do e-mail
+    msg.attach(MIMEText(resumo_final, 'plain'))
+    
+    # Conecta ao servidor do Gmail e envia
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(EMAIL_USER, EMAIL_PASS)
+    server.sendmail(EMAIL_USER, EMAIL_DESTINO, msg.as_string())
+    server.quit()
+    print("E-mail: Enviado com sucesso!")
+except Exception as e:
+    print(f"Erro E-mail: {e}")
+
+print("Processo finalizado!")
