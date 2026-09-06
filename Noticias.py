@@ -65,7 +65,7 @@ Notícias brutas:
 """
 
 resposta = client.models.generate_content(
-    model='gemini-1.5-flash-latest',
+    model='gemini-2.0-flash',  # Atualizado para o modelo mais recente e estável
     contents=prompt
 )
 resumo_final = resposta.text
