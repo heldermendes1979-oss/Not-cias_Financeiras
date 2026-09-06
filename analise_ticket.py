@@ -1,24 +1,26 @@
 import yfinance as yf
 import pandas_ta as ta
 import pandas as pd
+import os
+import requests
 
-# Carteira mista (Ações BR precisam do sufixo .SA, EUA/ETFs vão diretos, Cripto usa -USD)
+# Carteira com os Tickers exatos para o Yahoo Finance ler os preços
 ativos = [
-    '"VALE3.SA" OR "Vale"',
-    '"BBAS3.SA" OR "Banco do Brasil"',
-    '"PETR3.SA" OR "Petrobras"',
-    '"ITSA4.SA" OR "Itaúsa"',
-    '"WEGE3.SA" OR "WEG"',
-    '"EMBR3.SA" OR "Embraer"',
-    '"POMO3.SA" OR "Marcopolo"',
-    '"AXIA3.SA"',
-    '"VGT" ETF',
-    '"KWEB" ETF',
-    '"TFLO" ETF',
-    '"GLD" ouro',
-    '"RSP" ETF',
-    '"BITCOIN" criptomoeda',
-    '"Solana" criptomoeda'
+    "VALE3.SA",
+    "BBAS3.SA",
+    "PETR3.SA",
+    "ITSA4.SA",
+    "WEGE3.SA",
+    "EMBR3.SA",
+    "POMO3.SA",
+    "AXIA3.SA",
+    "VGT",
+    "KWEB",
+    "TFLO",
+    "GLD",
+    "RSP",
+    "BTC-USD",  # Código oficial do Bitcoin no Yahoo Finance
+    "SOL-USD"   # Código oficial da Solana no Yahoo Finance
 ]
 
 print("📊 Análise Técnica da Carteira\n")
@@ -26,12 +28,17 @@ relatorio = ""
 
 for ativo in ativos:
     try:
-        # 1. Baixar dados diários dos últimos 6 meses (necessário para calcular médias longas)
+        # 1. Baixar dados diários dos últimos 6 meses
         df = yf.download(ativo, period="6mo", progress=False)
         
-        # Correção para novas versões do yfinance que retornam colunas agrupadas
+        # Correção para novas versões do yfinance
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.droplevel(1)
+            
+        # Pula o ativo se não retornou dados válidos
+        if df.empty:
+            print(f"Sem dados para {ativo}")
+            continue
             
         # 2. Calcular os indicadores matemáticos automaticamente na tabela
         df.ta.ema(length=20, append=True)
@@ -49,13 +56,13 @@ for ativo in ativos:
         
         # --- LÓGICA DE DECISÃO ---
         
-        # A) Tendência (Curto prazo vs Médio prazo)
+        # A) Tendência
         if ema20 > ema50:
             tendencia = "Alta 📈"
         else:
             tendencia = "Baixa 📉"
             
-        # B) Ponto de Entrada (RSI abaixo de 30 é sobrevenda, acima de 70 é sobrecompra)
+        # B) Ponto de Entrada
         if rsi < 30:
             entrada = "Ponto de Entrada (Sobrevendido) 🟢"
         elif rsi > 70:
@@ -63,8 +70,7 @@ for ativo in ativos:
         else:
             entrada = "Neutro ⚪"
             
-        # C) Stop Loss de Volatilidade (Preço - 2x a oscilação média diária)
-        # O multiplicador 2 garante que você não seja "stopado" pelo ruído normal do dia a dia.
+        # C) Stop Loss de Volatilidade
         stop_loss = preco_atual - (2 * atr)
         
         # --- FORMATAÇÃO DO TEXTO ---
@@ -85,21 +91,17 @@ for ativo in ativos:
     except Exception as e:
         print(f"Erro ao processar {ativo}: {e}")
 
-# Aqui você pode enviar a variável 'relatorio' para a API do Telegram igual fez no bot de notícias.
-import os
-import requests
-
-# (Aqui fica todo aquele código de cálculo matemático do yfinance que mostrei antes)
-
 print("Enviando relatório para o Telegram...")
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
 CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
 
 url_tel = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+
+# Removido o parse_mode Markdown temporariamente para evitar falhas de envio
+# caso algum número gere um caractere não reconhecido pelo Telegram
 payload = {
     'chat_id': CHAT_ID,
-    'text': relatorio, # A variável que guardou o texto de todos os ativos
-    'parse_mode': 'Markdown'
+    'text': relatorio
 }
 
 resposta_telegram = requests.post(url_tel, data=payload)
